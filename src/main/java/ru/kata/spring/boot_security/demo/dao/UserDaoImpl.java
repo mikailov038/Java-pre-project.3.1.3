@@ -6,6 +6,7 @@ import ru.kata.spring.boot_security.demo.model.User;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +29,8 @@ public class UserDaoImpl implements UserDao {
     @Override
     public Optional<User> getUserByUsername(String username) {
         try {
-            return Optional.of((User) entityManager.createQuery("select u from User u where u.username = :username")
-                    .setParameter("username", username).getSingleResult());
+            TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class).setParameter("username", username);
+            return Optional.of(query.getSingleResult());
         } catch (NoResultException e) {
             return Optional.empty();
         }
@@ -37,7 +38,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> getUserList() {
-        return entityManager.createQuery("select u from User u").getResultList();
+        TypedQuery<User> query = entityManager.createQuery("SELECT u FROM User u", User.class);
+        return query.getResultList();
     }
 
     @Override
